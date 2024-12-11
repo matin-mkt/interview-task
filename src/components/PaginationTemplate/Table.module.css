@@ -1,0 +1,55 @@
+.select {
+  background-color: #222337;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  border-radius: 5px;
+  padding-right: 16px;
+  border-right: 16px solid transparent;
+  padding-left: 16px;
+  outline: 1px solid #4c485b;
+  background-image: url("/img/icons/down-dashboard.svg");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 8px 8px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+.select:hover {
+  outline: 1px solid #3f88f4;
+}
+.select option {
+  color: white;
+}
+
+.bgHeader {
+  background-color: rgba(63, 136, 244, 0.05);
+  border-right: solid 1px #3f88f4;
+  border-left: solid 1px #3f88f4;
+  border-bottom: solid 1px transparent;
+  border-top: solid 1px #3f88f4;
+  width: 12%;
+}
+.bgBody {
+  background-color: rgba(63, 136, 244, 0.05);
+  border-right: solid 1px #3f88f4;
+  border-left: solid 1px #3f88f4;
+  border-top: solid 1px #303040;
+  width: 15%;
+}
+.bgBodyLast {
+  background-color: rgba(63, 136, 244, 0.05);
+  border-right: solid 1px #3f88f4;
+  border-left: solid 1px #3f88f4;
+  border-bottom: solid 1px #3f88f4;
+  border-radius: 5px;
+  width: 15%;
+}
+.table thead tr th:last-child div,
+.table tbody tr td:last-child div {
+  justify-content: end;
+}
+
+.shadow {
+  filter: drop-shadow(2px 0px rgba(63, 136, 244, 0.1));
+}
