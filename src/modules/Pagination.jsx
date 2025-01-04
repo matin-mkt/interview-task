@@ -1,148 +1,75 @@
-"use client";
-import { useEffect, useState } from "react";
-import PaginationTemplate from "@/components/PaginationTemplate/PaginationTemplate";
+'use server';
 
-import PaginationButton from "@/components/PaginationTemplate/PaginationButton";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from 'next/link';
+import React from 'react';
 
-const Pagination = ({ lengthData, pathname }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState(20);
+export const Pagination = async (props) => {
+  const { offset = 0, totalPages } = props; // Use offset directly
+  const currentPage = Math.floor(offset / 20) + 1; // Derive currentPage from offset
 
-  const [totalPages, setTotalPages] = useState(Math.ceil(lengthData / limit));
+  const getPagesToShow = () => {
+    let startPage = Math.max(currentPage - 2, 1);
+    let endPage = Math.min(currentPage + 2, totalPages);
 
-  const [offset, setOffset] = useState((currentPage - 1) * limit);
-  const [endIndex, setEndIndex] = useState(offset + limit);
-
-  const router = useRouter();
-  const path = usePathname();
-  const searchParams = useSearchParams();
-
-  function handlePageChange(pageNumber) {
-    const curOffset = (pageNumber - 1) * limit;
-    setCurrentPage(pageNumber);
-    setOffset(curOffset);
-    const newEndIndex = curOffset + limit;
-    setEndIndex(newEndIndex);
-
-    const params = new URLSearchParams(searchParams);
-    params.set("limit", limit);
-    params.set("offset", curOffset);
-    router.push(`${path}?${params.toString()}`);
-  }
-
-  const handleSetLimit = (e) => {
-    const newLimit = Number(e.target.value);
-    setLimit(newLimit);
-    const newOffset = (currentPage - 1) * newLimit;
-    setOffset(newOffset);
-    const newEndIndex = newOffset + newLimit;
-    setEndIndex(newEndIndex);
-    const newTotalPages = Math.ceil(lengthData / newLimit);
-    setTotalPages(newTotalPages);
-
-    const params = new URLSearchParams(searchParams);
-    params.set("limit", newLimit);
-    params.set("offset", newOffset);
-
-    router.push(`${path}?${params.toString()}`);
-  };
-
-  useEffect(() => {
-    const queryLimit = searchParams.get("limit");
-    const queryOffset = searchParams.get("offset");
-
-    const newLimit = queryLimit ? parseInt(queryLimit) : 20;
-    const newOffset = queryOffset ? parseInt(queryOffset) : 0;
-    const pageNumber = parseInt(newOffset / newLimit) + 1;
-
-    setLimit(newLimit);
-    setOffset(newOffset);
-    setCurrentPage(pageNumber);
-  }, [searchParams]);
-
-  const pageNumberButtons = () => {
-    if (totalPages <= 6) {
-      const buttons = Array.from({ length: totalPages }, (_, i) => i + 1).map(
-        (pageNumber) => {
-          return (
-            <PaginationButton
-              key={pageNumber}
-              index={pageNumber}
-              currentPage={currentPage}
-              onClick={() => handlePageChange(pageNumber)}
-            />
-          );
-        }
-      );
-      return buttons;
-    } else {
-      if (currentPage <= 2 || currentPage >= totalPages - 1) {
-        return (
-          <>
-            {[1, 2, 3].map((i) => (
-              <PaginationButton
-                key={i}
-                index={i}
-                disabled={i === currentPage}
-                onClick={() => handlePageChange(i)}
-                currentPage={currentPage}
-              />
-            ))}
-            <div>...</div>
-            {[totalPages - 2, totalPages - 1, totalPages].map((i) => (
-              <PaginationButton
-                key={i}
-                index={i}
-                disabled={i === currentPage}
-                onClick={() => handlePageChange(i)}
-                currentPage={currentPage}
-              />
-            ))}
-          </>
-        );
-      } else if (3 <= currentPage <= totalPages - 2) {
-        return (
-          <>
-            <PaginationButton
-              index={1}
-              currentPage={currentPage}
-              onClick={() => handlePageChange(1)}
-            />
-            <div>...</div>
-            {[currentPage - 1, currentPage, currentPage + 1].map((i) => (
-              <PaginationButton
-                index={i}
-                onClick={() => handlePageChange(i)}
-                currentPage={currentPage}
-              />
-            ))}
-            <div>...</div>
-            <PaginationButton
-              index={totalPages}
-              onClick={() => handlePageChange(totalPages)}
-              currentPage={currentPage}
-            />
-          </>
-        );
-      }
+    if (currentPage <= 3) {
+      startPage = 1;
+      endPage = Math.min(5, totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      startPage = Math.max(totalPages - 4, 1);
+      endPage = totalPages;
     }
+
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i,
+    );
   };
+
+  const pages = getPagesToShow();
+  const hasPrevious = currentPage > 1;
+  const hasNext = currentPage < totalPages;
 
   return (
-    <PaginationTemplate
-      value={limit}
-      selectOnChange={(e) => handleSetLimit(e)}
-      offset={offset}
-      endIndex={endIndex}
-      lengthData={lengthData}
-      disabledPrevious={currentPage === 1}
-      handlePrevious={() => handlePageChange(currentPage - 1)}
-      pageNumberButtons={pageNumberButtons}
-      disabledNext={currentPage === totalPages}
-      handleNext={() => handlePageChange(currentPage + 1)}
-    />
+	<div className="flex items-center justify-center space-x-6 text-black dark:text-white">
+	{/* Previous Button */}
+	{hasPrevious && (
+	  <Link
+		href={`?offset=${(currentPage - 2) * 20}`}
+		className="px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
+	  >
+		Previous
+	  </Link>
+	)}
+
+	{/* Page Links */}
+	<nav
+	  aria-label="Pagination"
+	  className="relative z-0 inline-flex -space-x-px rounded-md"
+	>
+	  {pages.map((p) => (
+		<Link
+		  key={p}
+		  href={`?offset=${(p - 1) * 20}`}
+		  className={`px-3 py-1 rounded-md ${
+			p === currentPage
+			  ? 'bg-blue-500 text-white dark:bg-blue-600'
+			  : 'bg-gray-200 text-black dark:bg-gray-700 dark:text-white'
+		  } hover:bg-gray-300 dark:hover:bg-gray-600`}
+		>
+		  {p}
+		</Link>
+	  ))}
+	</nav>
+
+	{/* Next Button */}
+	{hasNext && (
+	  <Link
+		href={`?offset=${currentPage * 20}`}
+		className="px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
+	  >
+		Next
+	  </Link>
+	)}
+  </div>
   );
 };
-
-export default Pagination;

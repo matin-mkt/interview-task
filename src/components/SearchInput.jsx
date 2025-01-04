@@ -1,9 +1,9 @@
-"use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+// import { useEffect, useState } from "react";
+// import { useRouter } from "next/navigation";
 import search from "public/icons/search.svg";
 import Loader from "./Loader/Loader";
-import useDebounce from "@/hooks/useDebouce";
+import { redirect, RedirectType } from "next/navigation";
+// import useDebounce from "@/hooks/useDebouce";
 
 const SearchInput = ({
   name,
@@ -13,39 +13,46 @@ const SearchInput = ({
   isLoading,
   ...props
 }) => {
-  const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState(initialValue || "");
-  const debouncedSearchTerm = useDebounce(searchTerm, 400);
+  // const router = useRouter();
+  // const [searchTerm, setSearchTerm] = useState(initialValue || "");
+  let searchTerm = initialValue || ""
+  // const debouncedSearchTerm = useDebounce(searchTerm, 400);
 
-  const handleSearch = () => {
-    router.push(searchTerm ? `?q=${searchTerm}` : "?");
-  };
-
-  const handleChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      handleSearch();
-    }
-  };
-
-  useEffect(() => {
-    if (debouncedSearchTerm === "") {
-      router.push("?");
+  async function handleSearch(formData) {
+    "use server";
+    const searchQuery = formData.get("search");
+    if (searchQuery) {
+      redirect(`/?q=${searchQuery}`, RedirectType.replace);
     } else {
-      router.push(`?q=${debouncedSearchTerm}`);
+      redirect("/");
     }
-  }, [debouncedSearchTerm, router]);
+  }
+
+  // const handleChange = (e) => {
+  //   setSearchTerm(e.target.value);
+  // };
+
+  // const handleKeyDown = (event) => {
+  //   if (event.key === "Enter") {
+  //     handleSearch();
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (debouncedSearchTerm === "") {
+  //     router.push("?");
+  //   } else {
+  //     router.push(`?q=${debouncedSearchTerm}`);
+  //   }
+  // }, [debouncedSearchTerm, router]);
 
   return (
-    <div
+    <form action={handleSearch}
       className={`${
         className ?? ""
       } py-2.5 px-5 bg-[#2E2F3E] flex justify-start rounded-50`}
     >
-      <button className="text-white mr-2.5" onClick={handleSearch}>
+      <button type="submit" className="text-white mr-2.5">
         {isLoading ? (
           <Loader />
         ) : (
@@ -57,12 +64,13 @@ const SearchInput = ({
         className={`w-full bg-inherit text-white focus:outline-none text-lg leading-none`}
         placeholder={placeholder}
         name={name ?? "search"}
-        value={searchTerm}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
+        // value={searchTerm}
+        // onChange={handleChange}
+        // onKeyDown={handleKeyDown}
         {...props}
       />
-    </div>
+      {/* <button type="submit"></button> */}
+    </form>
   );
 };
 

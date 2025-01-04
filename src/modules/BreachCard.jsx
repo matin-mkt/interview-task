@@ -1,9 +1,12 @@
-"use client";
+"use client"
 import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
 import ArrowIcon from "public/icons/arrow.svg";
+import Image from "next/image";
 
-const BreachCard = ({ title, date, fields, leaked, description, icon }) => {
+const BreachCard = ({title, date, fields, leaked, description, icon}) => {
+ 
+  // const {title, date, fields, leaked, description, icon} = props
   const router = useRouter();
   const handleClick = () => {
     router.push();
@@ -55,7 +58,8 @@ const BreachCard = ({ title, date, fields, leaked, description, icon }) => {
             </p>
           </div>
         </div>
-        <ArrowIcon className="-rotate-45 ml-auto" />
+        {/* <ArrowIcon className="-rotate-45 ml-auto" /> */}
+        <Image alt={title} src={ArrowIcon} />
       </div>
       <p className="text-textGray leading-5 text-sm">{description}</p>
 
