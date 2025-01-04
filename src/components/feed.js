@@ -51,7 +51,7 @@ export const Feed = async (props) => {
                       date={breach.date_breached}
                       leaked={breach.compromised_fields} />
 				))}
-			<Pagination offset={40} totalPages={10} {...props.searchParams} {...metadata} />
+			<Pagination offset={pageNumber} totalPages={10} {...props.searchParams} {...metadata} />
 		</>
 	);
 };
